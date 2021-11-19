@@ -35,7 +35,7 @@ def all_parties():
 
     elif request.method == 'GET':
         # TODO: get all the parties
-        result = _LOADED_PARTIES
+        result = get_all_parties()
 
     return result
 
@@ -46,26 +46,26 @@ def loaded_parties():
     # TODO: returns the number of parties currently loaded in the system
     return jsonify({'loaded_parties': len(_LOADED_PARTIES["loaded_parties"])})
 
-"""
+
 # TODO: complete the decoration
-@parties.route("/party/<id>")
+@parties.route("/party/<id>", methods=['GET', 'DELETE'])
 def single_party(id):
     global _LOADED_PARTIES
     result = ""
 
     # TODO: check if the party is an existing one
-
+    exists_party(id)
     if 'GET' == request.method:
         # TODO: retrieve a party
-
+        result = jsonify(_LOADED_PARTIES['loaded_parties'][id])
     elif 'DELETE' == request.method:
         # TODO: delete a party
-
+        result = jsonify(_LOADED_PARTIES['loaded_parties'].remove(_LOADED_PARTIES['loaded_parties'][id]))
     return result
 
 
 # TODO: complete the decoration
-@parties.route("/party/<id>/foodlist")
+@parties.route("/party/<id>/foodlist", methods=['GET'])
 def get_foodlist(id):
     global _LOADED_PARTIES
     result = ""
@@ -79,7 +79,7 @@ def get_foodlist(id):
 
 
 # TODO: complete the decoration
-@parties.route("/party/<id>/foodlist/<user>/<item>")
+@parties.route("/party/<id>/foodlist/<user>/<item>", methods=['POST', 'DELETE'])
 def edit_foodlist(id, user, item):
     global _LOADED_PARTIES
 
@@ -132,4 +132,3 @@ def exists_party(_id):
         abort(404)  # error 404: Not Found, i.e. wrong URL, resource does not exist
     elif not(_id in _LOADED_PARTIES):
         abort(410)  # error 410: Gone, i.e. it existed but it's not there anymore
-"""
