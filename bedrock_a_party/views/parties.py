@@ -3,7 +3,8 @@ import random
 from flakon import JsonBlueprint
 from flask import abort, jsonify, request
 
-from bedrock_a_party.classes.party import CannotPartyAloneError, Party
+from bedrock_a_party.classes.party import CannotPartyAloneError, Party, \
+    NotInvitedGuestError, ItemAlreadyInsertedByUser, NotExistingFoodError
 
 parties = JsonBlueprint('parties', __name__)
 
@@ -21,7 +22,7 @@ def all_parties():
             result = create_party(request)
         except CannotPartyAloneError:
             # TODO: return 400
-            result = "Record not found", 400
+            abort(400)
 
     elif request.method == 'GET':
         # TODO: get all the parties
@@ -64,7 +65,7 @@ def get_foodlist(id):
     exists_party(id)
     if 'GET' == request.method:
         # TODO: retrieve food-list of the party
-        result = jsonify({'food_list': _LOADED_PARTIES[id].get_food_list().serialize()})
+        result = jsonify({'foodlist': _LOADED_PARTIES[id].get_food_list().serialize()})
     return result
 
 
@@ -76,15 +77,24 @@ def edit_foodlist(id, user, item):
     # TODO: check if the party is an existing one
     exists_party(id)
     # TODO: retrieve the party
-
+    party = _LOADED_PARTIES[id]
     result = ""
 
     if 'POST' == request.method:
         # TODO: add item to food-list handling NotInvitedGuestError (401) and ItemAlreadyInsertedByUser (400)
-
+        try:
+            result = jsonify(party.add_to_food_list(item=item, user=user).serialize())
+        except NotInvitedGuestError:
+            abort(401)
+        except ItemAlreadyInsertedByUser:
+            abort(400)
     if 'DELETE' == request.method:
         # TODO: delete item to food-list handling NotExistingFoodError (400)
-
+        try:
+            party.remove_from_food_list(item=item, user=user)
+            result = jsonify({'msg': 'Food deleted!'})
+        except NotExistingFoodError:
+            abort(400)
     return result
 
 #
