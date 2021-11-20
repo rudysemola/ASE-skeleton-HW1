@@ -47,10 +47,10 @@ def single_party(id):
     exists_party(id)
     if 'GET' == request.method:
         # TODO: retrieve a party
-        result = jsonify(_LOADED_PARTIES['loaded_parties'][id])
+        result = jsonify(_LOADED_PARTIES[id].serialize())
     elif 'DELETE' == request.method:
         # TODO: delete a party
-        result = jsonify(_LOADED_PARTIES['loaded_parties'].remove(_LOADED_PARTIES['loaded_parties'][id]))
+        del _LOADED_PARTIES[id]
     return result
 
 
@@ -64,7 +64,7 @@ def get_foodlist(id):
     exists_party(id)
     if 'GET' == request.method:
         # TODO: retrieve food-list of the party
-        result = jsonify({'foodlist': _LOADED_PARTIES['loaded_parties'][id]['foodlist']})
+        result =
     return result
 
 
