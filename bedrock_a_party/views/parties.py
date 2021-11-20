@@ -8,7 +8,6 @@ from bedrock_a_party.classes.party import CannotPartyAloneError, Party
 parties = JsonBlueprint('parties', __name__)
 
 _LOADED_PARTIES = {}  # dict of available parties
-_LOADED_PARTIES["loaded_parties"] = []
 _PARTY_NUMBER = 0  # index of the last created party
 
 
@@ -16,19 +15,10 @@ _PARTY_NUMBER = 0  # index of the last created party
 @parties.route("/parties", methods=["POST", "GET"])
 def all_parties():
     result = None
-    global _PARTY_NUMBER
-    global _LOADED_PARTIES
     if request.method == 'POST':
         try:
             # TODO: create a party
-            req_data = request.get_json()
-            # Create the id
-            if len(_LOADED_PARTIES["loaded_parties"]) != 0:
-                _PARTY_NUMBER += 1
-            new_party = Party(_PARTY_NUMBER, req_data["guests"])
-            # track the new party
-            _LOADED_PARTIES["loaded_parties"].append(new_party.serialize())
-            result = jsonify({"party_number": _PARTY_NUMBER})
+            result = create_party(request)
         except CannotPartyAloneError:
             # TODO: return 400
             result = "Record not found", 400
@@ -44,7 +34,7 @@ def all_parties():
 @parties.route("/parties/loaded", methods=['GET'])
 def loaded_parties():
     # TODO: returns the number of parties currently loaded in the system
-    return jsonify({'loaded_parties': len(_LOADED_PARTIES["loaded_parties"])})
+    return jsonify({'loaded_parties': _PARTY_NUMBER})
 
 
 # TODO: complete the decoration
@@ -71,10 +61,10 @@ def get_foodlist(id):
     result = ""
 
     # TODO: check if the party is an existing one
-
+    exists_party(id)
     if 'GET' == request.method:
         # TODO: retrieve food-list of the party
-
+        result = jsonify({'foodlist': _LOADED_PARTIES['loaded_parties'][id]['foodlist']})
     return result
 
 
@@ -84,7 +74,9 @@ def edit_foodlist(id, user, item):
     global _LOADED_PARTIES
 
     # TODO: check if the party is an existing one
+    exists_party(id)
     # TODO: retrieve the party
+
     result = ""
 
     if 'POST' == request.method:
