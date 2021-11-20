@@ -64,7 +64,7 @@ def get_foodlist(id):
     exists_party(id)
     if 'GET' == request.method:
         # TODO: retrieve food-list of the party
-        result =
+        result = jsonify({'food_list': _LOADED_PARTIES[id].get_food_list().serialize()})
     return result
 
 
